@@ -8,6 +8,136 @@ res 3
 
 int getLeastVmNum(int cpuCore, int[] serviceA, int[] serviceB)
 
+# ai
+``` java
+import java.util.PriorityQueue;
+
+public class Solution {
+    int getLeastVmNum(int cpuCore, int[] serviceA, int[] serviceB) {
+		// serviceA 使用最小堆
+		PriorityQueue<Integer> littleHeap = new PriorityQueue<>(serviceA.length, (x, y) -> x - y);
+		// serviceB 使用最大堆（通过反向排序来模拟最大堆）
+		PriorityQueue<Integer> bigHeap = new PriorityQueue<>(serviceB.length, (x, y) -> y - x);
+
+        // 将任务添加到对应的堆中
+        for (int i : serviceA) {
+            littleHeap.add(i);
+        }
+        for (int i : serviceB) {
+            bigHeap.add(i);
+        }
+
+        int count = 0; // 用于记录需要的虚拟机数量
+
+        while (!littleHeap.isEmpty() || !bigHeap.isEmpty()) {
+            // 如果 littleHeap 为空，则从 bigHeap 中取出最大任务并移到 littleHeap
+            if (littleHeap.isEmpty()) {
+                littleHeap.add(bigHeap.poll());
+            }
+            // 如果 bigHeap 为空，则处理 littleHeap 中的任务
+            if (bigHeap.isEmpty()) {
+                littleHeap.poll(); // 处理 littleHeap 中的任务
+                count++;
+            }
+            // 如果两个堆都有任务
+            else {
+                int littleTask = littleHeap.peek();
+                int bigTask = bigHeap.peek();
+                
+                // 尝试将 littleHeap 中的最小任务与 bigHeap 中的最大任务组合
+                if (littleTask + bigTask <= cpuCore) {
+                    // 如果能组合，处理两个任务
+                    littleHeap.poll();
+                    bigHeap.poll();
+                } else {
+                    // 如果不能组合，处理 littleHeap 中的任务
+                    littleHeap.poll();
+                }
+                count++;
+            }
+        }
+        return count; // 返回所需的虚拟机数量
+    }
+}
+```
+
+# 排序加双指针
+``` java
+import java.util.Arrays;
+
+public class Solution {
+    int getLeastVmNum(int cpuCore, int[] serviceA, int[] serviceB) {
+        // 对两个服务的任务进行排序
+        Arrays.sort(serviceA);
+        Arrays.sort(serviceB);
+
+        int count = 0;  // 用于记录虚拟机数量
+        int i = 0, j = serviceB.length - 1;
+
+        // 双指针方法
+        while (i < serviceA.length || j >= 0) {
+            if (i < serviceA.length && j >= 0 && serviceA[i] + serviceB[j] <= cpuCore) {
+                // 如果 serviceA[i] 和 serviceB[j] 能放在一台虚拟机里，就一起处理
+                i++;
+                j--;
+            } else if (i < serviceA.length) {
+                // 如果不能组合，处理 serviceA[i]
+                i++;
+            } else if (j >= 0) {
+                // 如果不能组合，处理 serviceB[j]
+                j--;
+            }
+            // 每次处理一个任务或者任务对都需要一台虚拟机
+            count++;
+        }
+
+        return count;
+    }
+}
+
+```
+
+# me
+``` java
+import java.util.PriorityQueue;
+
+public class Solution {
+	int getLeastVmNum(int cpuCore, int[] serviceA, int[] serviceB) {
+		PriorityQueue<Integer> littleHeap = new PriorityQueue<>((x, y) -> x - y);
+		PriorityQueue<Integer> bigHeap = new PriorityQueue<>((x, y) -> y - x);
+		for (int i : serviceA) {
+			littleHeap.add(i);
+		}
+		for (int i : serviceB) {
+			bigHeap.add(i);
+		}
+
+		int count = 0;
+		while (true) {
+			if (littleHeap.isEmpty() && !bigHeap.isEmpty()) {
+				littleHeap.add(bigHeap.poll());
+			}
+			if (!littleHeap.isEmpty() && bigHeap.isEmpty()) {
+				littleHeap.poll();
+				count++;
+			}
+			if (!littleHeap.isEmpty() && !bigHeap.isEmpty()) {
+				if (littleHeap.peek() + bigHeap.peek() <= cpuCore) {
+					littleHeap.poll();
+					bigHeap.poll();
+				} else {
+					littleHeap.poll();
+				}
+				count++;
+			} else {
+				break;
+			}
+		}
+		return count;
+	}
+}
+```
+
 
 
 # mine
