@@ -1,3 +1,15 @@
+#
+
+32 3 2
+16 8 16
+2 7
+
+res 3
+
+int getLeastVmNum(int cpuCore, int[] serviceA, int[] serviceB)
+
+
+
 # mine
 ```java
 import java.util.List;
